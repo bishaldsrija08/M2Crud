@@ -12,19 +12,32 @@ app.use(express.urlencoded({extended: true}))
 
 
 app.post("/create", async (req, res) => {
-    const { bookName, bookDescription, bookPrice, authorName, publishedAt } = req.body
+    const { bookName, bookDescription, bookPrice, authorName, publishedAt, publication } = req.body
+    if(!bookName || !bookDescription || !bookPrice || !authorName || !publishedAt || !publication){
+        return res.status(400).json({
+            message: "Please provide all the required fields: bookName, bookDescription, bookPrice, authorName, publishedAt, and publication."
+        })
+    }
     await Library.create({
         bookName,
         bookDescription,
         bookPrice,
         publishedAt,
-        authorName
+        authorName,
+        publication
     })
     return res.status(200).json({
         message: "Book created successfully."
     })
 })
 
+
+app.get("/books", async (req,res)=>{
+    const books = await Library.find()
+    return res.status(200).json({
+        data: books
+    })
+})
 
 
 
