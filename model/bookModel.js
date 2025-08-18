@@ -18,6 +18,9 @@ const librarySchema = new mongoose.Schema({
     },
     publication: {
         type: String
+    },
+    bookImage: {
+        type: String
     }
 })
 

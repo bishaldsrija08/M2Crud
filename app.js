@@ -1,16 +1,22 @@
 const express = require("express")
 const app = express()
 
+
+
 const connectToDatabase = require("./database")
 connectToDatabase()
 
 const Library = require("./model/bookModel")
 
+const { storage, multer } = require("./middleware/multerConfig")
+
+const upload = multer({storage:storage})
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 //create book
-app.post("/create", async (req, res) => {
+app.post("/create", upload.single('blogImage'), async (req, res) => {
     const { bookName, bookDescription, bookPrice, authorName, publishedAt, publication } = req.body
     if (!bookName || !bookDescription || !bookPrice || !authorName || !publishedAt || !publication) {
         return res.status(400).json({
@@ -23,7 +29,8 @@ app.post("/create", async (req, res) => {
         bookPrice,
         publishedAt,
         authorName,
-        publication
+        publication,
+        bookImage
     })
     return res.status(200).json({
         message: "Book created successfully."
@@ -83,11 +90,6 @@ app.delete("/delete/:id", async (req, res) => {
         message: "Book deleted successfully."
     })
 })
-
-
-
-
-
 
 
 app.listen(3000, () => {
