@@ -15,14 +15,22 @@ const upload = multer({storage:storage})
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.use(express.static("uploads"))
+
 //create book
-app.post("/create", upload.single('blogImage'), async (req, res) => {
+app.post("/create", upload.single('bookImage'), async (req, res) => {
     const { bookName, bookDescription, bookPrice, authorName, publishedAt, publication } = req.body
     if (!bookName || !bookDescription || !bookPrice || !authorName || !publishedAt || !publication) {
         return res.status(400).json({
             message: "Please provide all the required fields: bookName, bookDescription, bookPrice, authorName, publishedAt, and publication."
         })
     }
+    if(!req.file){
+        return res.status(400).json({
+            message: "Please upload a book image."
+        })
+    }
+    const file=req.file.filename
     await Library.create({
         bookName,
         bookDescription,
@@ -30,7 +38,7 @@ app.post("/create", upload.single('blogImage'), async (req, res) => {
         publishedAt,
         authorName,
         publication,
-        bookImage
+        bookImage: `http://localhost:3000/${file}`
     })
     return res.status(200).json({
         message: "Book created successfully."
