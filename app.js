@@ -15,7 +15,7 @@ const upload = multer({storage:storage})
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use(express.static("uploads"))
+app.use(express.static("./uploads/"))
 
 //create book
 app.post("/create", upload.single('bookImage'), async (req, res) => {
@@ -30,7 +30,8 @@ app.post("/create", upload.single('bookImage'), async (req, res) => {
             message: "Please upload a book image."
         })
     }
-    const file=req.file.filename
+    const fileName=req.file.filename
+    console.log(req.file)
     await Library.create({
         bookName,
         bookDescription,
@@ -38,7 +39,7 @@ app.post("/create", upload.single('bookImage'), async (req, res) => {
         publishedAt,
         authorName,
         publication,
-        bookImage: `http://localhost:3000/${file}`
+        bookImage: `http://localhost:3000/${fileName}`
     })
     return res.status(200).json({
         message: "Book created successfully."
