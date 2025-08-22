@@ -74,9 +74,8 @@ app.get("/book/:id", async (req, res) => {
 app.patch("/edit/:id", upload.single('bookImage'),async (req, res) => {
     const { id } = req.params
     const { bookName, bookDescription, bookPrice, authorName, publishedAt, publication } = req.body
-    
     const oldDatas = await Library.findById(id)
-    
+    let fileName;
     if(req.file){
         const oldImagePath = oldDatas.bookImage
         const newImagePath = oldImagePath.slice(22)
@@ -87,6 +86,7 @@ app.patch("/edit/:id", upload.single('bookImage'),async (req, res) => {
                 console.log("Image deleted successfully.")
             }
         })
+        fileName =`http://localhost:3000/${req.file.filename}`
     }
 
     if (!bookName || !bookDescription || !bookPrice || !authorName || !publishedAt || !publication) {
@@ -100,7 +100,8 @@ app.patch("/edit/:id", upload.single('bookImage'),async (req, res) => {
         bookPrice,
         publishedAt,
         authorName,
-        publication
+        publication,
+        bookImage: fileName
     })
     return res.status(200).json({
         message: "Book edited successfully."
