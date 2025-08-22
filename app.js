@@ -1,6 +1,8 @@
 const express = require("express")
 const app = express()
 
+const fs = require("fs")
+
 
 
 const connectToDatabase = require("./database")
@@ -69,9 +71,24 @@ app.get("/book/:id", async (req, res) => {
 })
 
 // edit book
-app.patch("/edit/:id", async (req, res) => {
+app.patch("/edit/:id", upload.single('bookImage'),async (req, res) => {
     const { id } = req.params
     const { bookName, bookDescription, bookPrice, authorName, publishedAt, publication } = req.body
+    
+    const oldDatas = await Library.findById(id)
+    
+    if(req.file){
+        const oldImagePath = oldDatas.bookImage
+        const newImagePath = oldImagePath.slice(22)
+        fs.unlink(`./uploads/${newImagePath}`, (err)=>{
+            if(err){
+                console.log(err)
+            }else{
+                console.log("Image deleted successfully.")
+            }
+        })
+    }
+
     if (!bookName || !bookDescription || !bookPrice || !authorName || !publishedAt || !publication) {
         return res.status(400).json({
             message: "Please provide all the required fields: bookName, bookDescription, bookPrice, authorName, publishedAt, and publication."
