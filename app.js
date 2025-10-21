@@ -129,6 +129,10 @@ app.delete("/delete/:id", async (req, res) => {
             console.log("Image deleted successfully.")
         }
     })
+    await Library.findByIdAndDelete(id)
+    return res.status(200).json({
+        message: "Book deleted successfully."
+    })
 })
 
 
