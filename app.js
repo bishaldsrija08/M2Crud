@@ -119,9 +119,15 @@ app.patch("/edit/:id", upload.single('bookImage'), async (req, res) => {
 
 app.delete("/delete/:id", async (req, res) => {
     const { id } = req.params
-    await Library.findByIdAndDelete(id)
-    return res.status(200).json({
-        message: "Book deleted successfully."
+    const oldDatas = await Library.findById(id)
+    const oldImagePath = oldDatas.bookImage
+    const newImagePath = oldImagePath.slice(22)
+    fs.unlink(`./uploads/${newImagePath}`, (err) => {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log("Image deleted successfully.")
+        }
     })
 })
 
