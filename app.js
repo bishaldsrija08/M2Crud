@@ -3,7 +3,14 @@ const app = express()
 
 const fs = require("fs")
 
-
+// Cors
+const cors = require("cors")
+app.use(cors(
+    {
+        origin: "*",
+        optionsSuccessStatus: 200
+    }
+))
 
 const connectToDatabase = require("./database")
 connectToDatabase()
@@ -12,7 +19,7 @@ const Library = require("./model/bookModel")
 
 const { storage, multer } = require("./middleware/multerConfig")
 
-const upload = multer({storage:storage})
+const upload = multer({ storage: storage })
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -27,12 +34,12 @@ app.post("/create", upload.single('bookImage'), async (req, res) => {
             message: "Please provide all the required fields: bookName, bookDescription, bookPrice, authorName, publishedAt, and publication."
         })
     }
-    if(!req.file){
+    if (!req.file) {
         return res.status(400).json({
             message: "Please upload a book image."
         })
     }
-    const fileName=req.file.filename
+    const fileName = req.file.filename
     console.log(req.file)
     await Library.create({
         bookName,
@@ -71,22 +78,22 @@ app.get("/book/:id", async (req, res) => {
 })
 
 // edit book
-app.patch("/edit/:id", upload.single('bookImage'),async (req, res) => {
+app.patch("/edit/:id", upload.single('bookImage'), async (req, res) => {
     const { id } = req.params
     const { bookName, bookDescription, bookPrice, authorName, publishedAt, publication } = req.body
     const oldDatas = await Library.findById(id)
     let fileName;
-    if(req.file){
+    if (req.file) {
         const oldImagePath = oldDatas.bookImage
         const newImagePath = oldImagePath.slice(22)
-        fs.unlink(`./uploads/${newImagePath}`, (err)=>{
-            if(err){
+        fs.unlink(`./uploads/${newImagePath}`, (err) => {
+            if (err) {
                 console.log(err)
-            }else{
+            } else {
                 console.log("Image deleted successfully.")
             }
         })
-        fileName =`http://localhost:3000/${req.file.filename}`
+        fileName = `http://localhost:3000/${req.file.filename}`
     }
 
     if (!bookName || !bookDescription || !bookPrice || !authorName || !publishedAt || !publication) {
